@@ -7,6 +7,7 @@ pub use elf_sections::{ELF_SECTION_WRITABLE, ELF_SECTION_ALLOCATED, ELF_SECTION_
 pub use memory_map::{MemoryMapTag, MemoryArea, MemoryAreaIter};
 pub use module::{ModuleTag, ModuleIter};
 pub use command_line::CommandLineTag;
+pub use acpi_2::ACPI2Tag;
 
 #[macro_use]
 extern crate bitflags;
@@ -17,6 +18,7 @@ mod elf_sections;
 mod memory_map;
 mod module;
 mod command_line;
+mod acpi_2;
 
 pub unsafe fn load(address: usize) -> &'static BootInformation {
     let multiboot = &*(address as *const BootInformation);
@@ -58,6 +60,11 @@ impl BootInformation {
 
     pub fn command_line_tag(&self) -> Option<&'static CommandLineTag> {
         self.get_tag(1).map(|tag| unsafe{&*(tag as *const Tag as *const CommandLineTag)})
+    }
+
+    pub fn acpi_2_tag(&self) -> Option<&'static ACPI2Tag>
+    {
+        self.get_tag(15).map(|tag| unsafe{&*(tag as *const Tag as *const ACPI2Tag)})
     }
 
     fn has_valid_end_tag(&self) -> bool {
