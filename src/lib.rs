@@ -8,6 +8,7 @@ pub use memory_map::{MemoryMapTag, MemoryArea, MemoryAreaIter};
 pub use module::{ModuleTag, ModuleIter};
 pub use command_line::CommandLineTag;
 pub use acpi_2::ACPI2Tag;
+pub use framebuffer::FramebufferTag;
 
 #[macro_use]
 extern crate bitflags;
@@ -19,6 +20,7 @@ mod memory_map;
 mod module;
 mod command_line;
 mod acpi_2;
+mod framebuffer;
 
 pub unsafe fn load(address: usize) -> &'static BootInformation {
     let multiboot = &*(address as *const BootInformation);
@@ -65,6 +67,11 @@ impl BootInformation {
     pub fn acpi_2_tag(&self) -> Option<&'static ACPI2Tag>
     {
         self.get_tag(15).map(|tag| unsafe{&*(tag as *const Tag as *const ACPI2Tag)})
+    }
+
+    pub fn framebuffer_tag(&self) -> Option<&'static FramebufferTag>
+    {
+        self.get_tag(8).map(|tag| unsafe{&*(tag as *const Tag as *const FramebufferTag)})
     }
 
     fn has_valid_end_tag(&self) -> bool {
